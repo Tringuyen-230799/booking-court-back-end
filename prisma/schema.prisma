@@ -5,10 +5,78 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+model Court {
+  id             String   @id @default(uuid())
+  name           String
+  rating         Int?     @default(0)
+  hourlyPrice    Decimal  @db.Decimal(10, 2) // Base hourly rate
+  eventSurcharge Decimal? @db.Decimal(10, 2) // Additional fee for events
+  isAvailable    Boolean  @default(true)
+  isIndoor       Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  // Many-to-many relationships
+  categories CourtCategory[]
+  facilities CourtFacility[]
+
+  images CourtImage[]
+
+  @@map("courts")
+}
+
+model Category {
+  id     Int             @id @default(autoincrement())
+  name   String          @unique
+  courts CourtCategory[]
+
+  @@map("categories")
+}
+
+model Facility {
+  id     Int             @id @default(autoincrement())
+  name   String          @unique
+  courts CourtFacility[]
+
+  @@map("facilities")
+}
+
+model CourtCategory {
+  courtId    String
+  categoryId Int
+  court      Court    @relation(fields: [courtId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@id([courtId, categoryId])
+  @@map("court_categories")
+}
+
+model CourtFacility {
+  courtId    String
+  facilityId Int
+  court      Court    @relation(fields: [courtId], references: [id], onDelete: Cascade)
+  facility   Facility @relation(fields: [facilityId], references: [id], onDelete: Cascade)
+
+  @@id([courtId, facilityId])
+  @@map("court_facilities")
+}
+
+model CourtImage {
+  id           Int      @id @default(autoincrement())
+  courtId      String
+  court        Court    @relation(fields: [courtId], references: [id], onDelete: Cascade)
+  imageUrl     String
+  altText      String?
+  displayOrder Int      @default(0)
+  isPrimary    Boolean  @default(false)
+
+  @@map("court_images")
 }
