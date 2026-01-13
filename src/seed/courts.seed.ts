@@ -1,7 +1,42 @@
 import 'dotenv/config';
-import { PrismaService } from '../shared/config/prisma.service';
+import { Court } from 'generated/prisma';
+import { PrismaService } from 'src/shared/config/prisma.service';
 
 const prisma = new PrismaService();
+
+const courtNames = [
+  'Sunshine Sports Center',
+  'Greenfield Tennis Club',
+  'Downtown Basketball Arena',
+  'Lakeside Volleyball Courts',
+  'Mountainview Sports Complex',
+  'Riverside Badminton Hall',
+];
+
+const address = ['123 Main St', '456 Oak Ave', '789 Pine Rd', '101 Maple Blvd'];
+
+const imageUrl = [
+  'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400',
+  'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400',
+  'https://images.unsplash.com/photo-1544717297-fa95b6ee9643?w=400',
+  'https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=400',
+  'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=400',
+  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
+  'https://images.unsplash.com/photo-1547347298-4074fc3086f0?w=400',
+  'https://images.unsplash.com/photo-1587280501635-68a0e82cd5ff?w=400',
+  'https://images.unsplash.com/photo-1574623452334-1e0ac2b3ccb4?w=400',
+  'https://images.unsplash.com/photo-1626224583764-f87db24ac4ea?w=400',
+  'https://images.unsplash.com/photo-1553778263-73a83bab9b0c?w=400',
+  'https://images.unsplash.com/photo-1609906851638-9b0e6bdee9cd?w=400',
+  'https://images.unsplash.com/photo-1554068865-24cecd4e34b8?w=400',
+  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
+  'https://images.unsplash.com/photo-1519861531473-9200262188bf?w=400',
+  'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400',
+  'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400',
+  'https://images.unsplash.com/photo-1551698618-1dfe5d97d256?w=400',
+  'https://images.unsplash.com/photo-1544717297-fa95b6ee9643?w=400',
+  'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400',
+];
 
 async function main() {
   console.log('🌱 Starting seed...');
@@ -13,485 +48,84 @@ async function main() {
   await prisma.court.deleteMany({});
   await prisma.facility.deleteMany({});
   await prisma.category.deleteMany({});
+}
 
-  console.log('🧹 Cleaned existing data');
-
-  // Seed Categories
-  const categories = await Promise.all([
-    prisma.category.create({
-      data: { name: 'Basketball' },
-    }),
-    prisma.category.create({
-      data: { name: 'Tennis' },
-    }),
-    prisma.category.create({
-      data: { name: 'Badminton' },
-    }),
-    prisma.category.create({
-      data: { name: 'Volleyball' },
-    }),
-    prisma.category.create({
-      data: { name: 'Futsal' },
-    }),
-  ]);
-
-  console.log(`📂 Created ${categories.length} categories`);
-
-  // Seed Facilities
-  const facilities = await Promise.all([
-    prisma.facility.create({
-      data: { name: 'Air Conditioning' },
-    }),
-    prisma.facility.create({
-      data: { name: 'Parking' },
-    }),
-    prisma.facility.create({
-      data: { name: 'Changing Room' },
-    }),
-    prisma.facility.create({
-      data: { name: 'Shower' },
-    }),
-    prisma.facility.create({
-      data: { name: 'Equipment Rental' },
-    }),
-    prisma.facility.create({
-      data: { name: 'Water Fountain' },
-    }),
-    prisma.facility.create({
-      data: { name: 'Sound System' },
-    }),
-    prisma.facility.create({
-      data: { name: 'Lighting' },
-    }),
-  ]);
-
-  console.log(`🏗️ Created ${facilities.length} facilities`);
-
-  // Seed Courts
-  const courts = await Promise.all([
-    // Basketball Courts
-    prisma.court.create({
-      data: {
-        name: 'Central Basketball Arena',
-        rating: 5,
-        hourlyPrice: 25.0,
-        eventSurcharge: 15.0,
-        isAvailable: true,
-        isIndoor: true,
-      },
-    }),
-    prisma.court.create({
-      data: {
-        name: 'Outdoor Basketball Court A',
-        rating: 4,
-        hourlyPrice: 15.0,
-        eventSurcharge: 10.0,
-        isAvailable: true,
-        isIndoor: false,
-      },
-    }),
-
-    // Tennis Courts
-    prisma.court.create({
-      data: {
-        name: 'Premium Tennis Court 1',
-        rating: 5,
-        hourlyPrice: 30.0,
-        eventSurcharge: 20.0,
-        isAvailable: true,
-        isIndoor: true,
-      },
-    }),
-    prisma.court.create({
-      data: {
-        name: 'Tennis Court 2',
-        rating: 4,
-        hourlyPrice: 20.0,
-        eventSurcharge: 12.0,
-        isAvailable: true,
-        isIndoor: false,
-      },
-    }),
-
-    // Multi-purpose Courts
-    prisma.court.create({
-      data: {
-        name: 'Multi-Sport Arena A',
-        rating: 4,
-        hourlyPrice: 22.0,
-        eventSurcharge: 18.0,
-        isAvailable: true,
-        isIndoor: true,
-      },
-    }),
-    prisma.court.create({
-      data: {
-        name: 'Multi-Sport Arena B',
-        rating: 3,
-        hourlyPrice: 18.0,
-        eventSurcharge: 12.0,
-        isAvailable: false,
-        isIndoor: true,
-      },
-    }),
-
-    // Badminton Courts
-    prisma.court.create({
-      data: {
-        name: 'Badminton Hall 1',
-        rating: 4,
-        hourlyPrice: 12.0,
-        eventSurcharge: 8.0,
-        isAvailable: true,
-        isIndoor: true,
-      },
-    }),
-    prisma.court.create({
-      data: {
-        name: 'Badminton Hall 2',
-        rating: 3,
-        hourlyPrice: 10.0,
-        eventSurcharge: 6.0,
-        isAvailable: true,
-        isIndoor: true,
-      },
-    }),
-  ]);
-
-  console.log(`🏟️ Created ${courts.length} courts`);
-
-  // Create court-category relationships
-  const courtCategories = [
-    // Basketball courts
-    { courtId: courts[0].id, categoryId: categories[0].id }, // Central Basketball Arena - Basketball
-    { courtId: courts[1].id, categoryId: categories[0].id }, // Outdoor Basketball Court A - Basketball
-
-    // Tennis courts
-    { courtId: courts[2].id, categoryId: categories[1].id }, // Premium Tennis Court 1 - Tennis
-    { courtId: courts[3].id, categoryId: categories[1].id }, // Tennis Court 2 - Tennis
-
-    // Multi-purpose courts (Basketball + Volleyball + Futsal)
-    { courtId: courts[4].id, categoryId: categories[0].id }, // Multi-Sport Arena A - Basketball
-    { courtId: courts[4].id, categoryId: categories[3].id }, // Multi-Sport Arena A - Volleyball
-    { courtId: courts[4].id, categoryId: categories[4].id }, // Multi-Sport Arena A - Futsal
-    { courtId: courts[5].id, categoryId: categories[0].id }, // Multi-Sport Arena B - Basketball
-    { courtId: courts[5].id, categoryId: categories[3].id }, // Multi-Sport Arena B - Volleyball
-
-    // Badminton courts
-    { courtId: courts[6].id, categoryId: categories[2].id }, // Badminton Hall 1 - Badminton
-    { courtId: courts[7].id, categoryId: categories[2].id }, // Badminton Hall 2 - Badminton
-  ];
-
-  await Promise.all(
-    courtCategories.map((relationship) =>
-      prisma.courtCategory.create({
-        data: relationship,
-      }),
-    ),
+// Helper to get random items from an array
+function getRandomItems<T>(array: T[], min = 1, max = 2): T[] {
+  const count = Math.max(
+    min,
+    Math.floor(Math.random() * (max - min + 1)) + min,
   );
+  return [...array].sort(() => 0.5 - Math.random()).slice(0, count);
+}
 
-  console.log(
-    `🔗 Created ${courtCategories.length} court-category relationships`,
-  );
+// Mock court seeding function
+export async function seedMockCourts(
+  count: number,
+  categories: { id: number }[],
+  facilities: { id: number }[],
+): Promise<Court[]> {
+  if (count <= 0) return [];
 
-  // Create court-facility relationships
-  const courtFacilities = [
-    // Central Basketball Arena (Premium facilities)
-    { courtId: courts[0].id, facilityId: facilities[0].id }, // Air Conditioning
-    { courtId: courts[0].id, facilityId: facilities[1].id }, // Parking
-    { courtId: courts[0].id, facilityId: facilities[2].id }, // Changing Room
-    { courtId: courts[0].id, facilityId: facilities[3].id }, // Shower
-    { courtId: courts[0].id, facilityId: facilities[4].id }, // Equipment Rental
-    { courtId: courts[0].id, facilityId: facilities[6].id }, // Sound System
-    { courtId: courts[0].id, facilityId: facilities[7].id }, // Lighting
+  const createdCourts: Court[] = [];
 
-    // Outdoor Basketball Court A (Basic facilities)
-    { courtId: courts[1].id, facilityId: facilities[1].id }, // Parking
-    { courtId: courts[1].id, facilityId: facilities[5].id }, // Water Fountain
-    { courtId: courts[1].id, facilityId: facilities[7].id }, // Lighting
+  for (let i = 0; i < count; i++) {
+    // Use mock data arrays for more variety
+    const name =
+      courtNames[i % courtNames.length] +
+      (count > courtNames.length
+        ? ` ${Math.floor(i / courtNames.length) + 1}`
+        : '');
+    const addr = address[i % address.length];
+    const img = imageUrl[i % imageUrl.length];
 
-    // Premium Tennis Court 1 (Premium facilities)
-    { courtId: courts[2].id, facilityId: facilities[0].id }, // Air Conditioning
-    { courtId: courts[2].id, facilityId: facilities[1].id }, // Parking
-    { courtId: courts[2].id, facilityId: facilities[2].id }, // Changing Room
-    { courtId: courts[2].id, facilityId: facilities[3].id }, // Shower
-    { courtId: courts[2].id, facilityId: facilities[4].id }, // Equipment Rental
-    { courtId: courts[2].id, facilityId: facilities[7].id }, // Lighting
-
-    // Tennis Court 2 (Standard facilities)
-    { courtId: courts[3].id, facilityId: facilities[1].id }, // Parking
-    { courtId: courts[3].id, facilityId: facilities[2].id }, // Changing Room
-    { courtId: courts[3].id, facilityId: facilities[5].id }, // Water Fountain
-    { courtId: courts[3].id, facilityId: facilities[7].id }, // Lighting
-
-    // Multi-Sport Arena A (Good facilities)
-    { courtId: courts[4].id, facilityId: facilities[0].id }, // Air Conditioning
-    { courtId: courts[4].id, facilityId: facilities[1].id }, // Parking
-    { courtId: courts[4].id, facilityId: facilities[2].id }, // Changing Room
-    { courtId: courts[4].id, facilityId: facilities[3].id }, // Shower
-    { courtId: courts[4].id, facilityId: facilities[6].id }, // Sound System
-    { courtId: courts[4].id, facilityId: facilities[7].id }, // Lighting
-
-    // Multi-Sport Arena B (Standard facilities)
-    { courtId: courts[5].id, facilityId: facilities[1].id }, // Parking
-    { courtId: courts[5].id, facilityId: facilities[2].id }, // Changing Room
-    { courtId: courts[5].id, facilityId: facilities[7].id }, // Lighting
-
-    // Badminton Hall 1 (Good facilities)
-    { courtId: courts[6].id, facilityId: facilities[0].id }, // Air Conditioning
-    { courtId: courts[6].id, facilityId: facilities[1].id }, // Parking
-    { courtId: courts[6].id, facilityId: facilities[2].id }, // Changing Room
-    { courtId: courts[6].id, facilityId: facilities[7].id }, // Lighting
-
-    // Badminton Hall 2 (Basic facilities)
-    { courtId: courts[7].id, facilityId: facilities[1].id }, // Parking
-    { courtId: courts[7].id, facilityId: facilities[5].id }, // Water Fountain
-    { courtId: courts[7].id, facilityId: facilities[7].id }, // Lighting
-  ];
-
-  await Promise.all(
-    courtFacilities.map((relationship) =>
-      prisma.courtFacility.create({
-        data: relationship,
-      }),
-    ),
-  );
-
-  console.log(
-    `🔗 Created ${courtFacilities.length} court-facility relationships`,
-  );
-
-  // Seed Court Images (using placeholder images)
-  const images = await Promise.all([
-    // Central Basketball Arena (courts[0])
-    prisma.courtImage.create({
+    const court = await prisma.court.create({
       data: {
-        courtId: courts[0].id,
-        imageUrl:
-          'https://placehold.co/800x600/2563eb/ffffff?text=Basketball+Arena+Main',
-        altText: 'Central Basketball Arena main view',
+        name,
+        rating: Math.floor(Math.random() * 6), // 0-5
+        hourlyPrice: Math.floor(Math.random() * 30) + 10, // 10-39
+        eventSurcharge: Math.floor(Math.random() * 20), // 0-19
+        isAvailable: Math.random() > 0.2, // 80% available
+        isIndoor: Math.random() > 0.5,
+        address: addr,
+      },
+    });
+
+    createdCourts.push(court);
+
+    // Assign random categories
+    const randomCategories = getRandomItems(categories, 1, 2);
+    await Promise.all(
+      randomCategories.map((cat) =>
+        prisma.courtCategory.create({
+          data: { courtId: court.id, categoryId: cat.id },
+        }),
+      ),
+    );
+
+    // Assign random facilities
+    const randomFacilities = getRandomItems(facilities, 2, 4);
+    await Promise.all(
+      randomFacilities.map((fac) =>
+        prisma.courtFacility.create({
+          data: { courtId: court.id, facilityId: fac.id },
+        }),
+      ),
+    );
+
+    // Add a real image from the mock array
+    await prisma.courtImage.create({
+      data: {
+        courtId: court.id,
+        imageUrl: img,
+        altText: `${name} image`,
         displayOrder: 1,
         isPrimary: true,
       },
-    }),
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[0].id,
-        imageUrl:
-          'https://placehold.co/800x600/1e40af/ffffff?text=Basketball+Seating',
-        altText: 'Central Basketball Arena seating area',
-        displayOrder: 2,
-        isPrimary: false,
-      },
-    }),
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[0].id,
-        imageUrl:
-          'https://placehold.co/800x600/1e3a8a/ffffff?text=Basketball+Court',
-        altText: 'Central Basketball Arena court detail',
-        displayOrder: 3,
-        isPrimary: false,
-      },
-    }),
+    });
+  }
 
-    // Outdoor Basketball Court A (courts[1])
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[1].id,
-        imageUrl:
-          'https://placehold.co/800x600/dc2626/ffffff?text=Outdoor+Basketball',
-        altText: 'Outdoor Basketball Court A main view',
-        displayOrder: 1,
-        isPrimary: true,
-      },
-    }),
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[1].id,
-        imageUrl:
-          'https://placehold.co/800x600/b91c1c/ffffff?text=Outdoor+Court+Night',
-        altText: 'Outdoor Basketball Court A at night',
-        displayOrder: 2,
-        isPrimary: false,
-      },
-    }),
-
-    // Premium Tennis Court 1 (courts[2])
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[2].id,
-        imageUrl:
-          'https://placehold.co/800x600/16a34a/ffffff?text=Tennis+Court+Premium',
-        altText: 'Premium Tennis Court 1 main view',
-        displayOrder: 1,
-        isPrimary: true,
-      },
-    }),
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[2].id,
-        imageUrl:
-          'https://placehold.co/800x600/15803d/ffffff?text=Tennis+Facilities',
-        altText: 'Premium Tennis Court 1 changing room',
-        displayOrder: 2,
-        isPrimary: false,
-      },
-    }),
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[2].id,
-        imageUrl:
-          'https://placehold.co/800x600/166534/ffffff?text=Tennis+Equipment',
-        altText: 'Premium Tennis Court 1 equipment rental area',
-        displayOrder: 3,
-        isPrimary: false,
-      },
-    }),
-
-    // Tennis Court 2 (courts[3])
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[3].id,
-        imageUrl:
-          'https://placehold.co/800x600/ca8a04/ffffff?text=Tennis+Court+2',
-        altText: 'Tennis Court 2 main view',
-        displayOrder: 1,
-        isPrimary: true,
-      },
-    }),
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[3].id,
-        imageUrl:
-          'https://placehold.co/800x600/a16207/ffffff?text=Tennis+Outdoor',
-        altText: 'Tennis Court 2 outdoor view',
-        displayOrder: 2,
-        isPrimary: false,
-      },
-    }),
-
-    // Multi-Sport Arena A (courts[4])
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[4].id,
-        imageUrl:
-          'https://placehold.co/800x600/7c3aed/ffffff?text=Multi+Sport+Arena',
-        altText: 'Multi-Sport Arena A main view',
-        displayOrder: 1,
-        isPrimary: true,
-      },
-    }),
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[4].id,
-        imageUrl:
-          'https://placehold.co/800x600/6d28d9/ffffff?text=Basketball+Setup',
-        altText: 'Multi-Sport Arena A basketball setup',
-        displayOrder: 2,
-        isPrimary: false,
-      },
-    }),
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[4].id,
-        imageUrl:
-          'https://placehold.co/800x600/5b21b6/ffffff?text=Volleyball+Setup',
-        altText: 'Multi-Sport Arena A volleyball setup',
-        displayOrder: 3,
-        isPrimary: false,
-      },
-    }),
-
-    // Multi-Sport Arena B (courts[5])
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[5].id,
-        imageUrl:
-          'https://placehold.co/800x600/ea580c/ffffff?text=Multi+Sport+B',
-        altText: 'Multi-Sport Arena B main view',
-        displayOrder: 1,
-        isPrimary: true,
-      },
-    }),
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[5].id,
-        imageUrl:
-          'https://placehold.co/800x600/c2410c/ffffff?text=Arena+B+Court',
-        altText: 'Multi-Sport Arena B court view',
-        displayOrder: 2,
-        isPrimary: false,
-      },
-    }),
-
-    // Badminton Hall 1 (courts[6])
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[6].id,
-        imageUrl:
-          'https://placehold.co/800x600/0891b2/ffffff?text=Badminton+Hall+1',
-        altText: 'Badminton Hall 1 main view',
-        displayOrder: 1,
-        isPrimary: true,
-      },
-    }),
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[6].id,
-        imageUrl:
-          'https://placehold.co/800x600/0e7490/ffffff?text=Badminton+Courts',
-        altText: 'Badminton Hall 1 multiple courts view',
-        displayOrder: 2,
-        isPrimary: false,
-      },
-    }),
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[6].id,
-        imageUrl:
-          'https://placehold.co/800x600/155e75/ffffff?text=Badminton+AC',
-        altText: 'Badminton Hall 1 air conditioning system',
-        displayOrder: 3,
-        isPrimary: false,
-      },
-    }),
-
-    // Badminton Hall 2 (courts[7])
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[7].id,
-        imageUrl:
-          'https://placehold.co/800x600/db2777/ffffff?text=Badminton+Hall+2',
-        altText: 'Badminton Hall 2 main view',
-        displayOrder: 1,
-        isPrimary: true,
-      },
-    }),
-    prisma.courtImage.create({
-      data: {
-        courtId: courts[7].id,
-        imageUrl:
-          'https://placehold.co/800x600/be185d/ffffff?text=Badminton+Basic',
-        altText: 'Badminton Hall 2 basic facilities',
-        displayOrder: 2,
-        isPrimary: false,
-      },
-    }),
-  ]);
-
-  console.log(`📸 Created ${images.length} court images`);
-
-  console.log('✅ Seed completed successfully!');
-
-  // Summary
-  console.log('\n📊 Seed Summary:');
-  console.log(`- Categories: ${categories.length}`);
-  console.log(`- Facilities: ${facilities.length}`);
-  console.log(`- Courts: ${courts.length}`);
-  console.log(`- Court-Category relationships: ${courtCategories.length}`);
-  console.log(`- Court-Facility relationships: ${courtFacilities.length}`);
-  console.log(`- Images: ${images.length}`);
+  return createdCourts;
 }
 
 main()
