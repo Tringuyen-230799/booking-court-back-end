@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/config/prisma.service';
 import { CourtDto, CourtQueryResult } from './courts.dto';
 import { QueryCourtsSchema } from './courts.schema';
+import { Prisma } from 'generated/prisma';
 
 @Injectable()
 export class CourtsService {
@@ -23,9 +24,42 @@ export class CourtsService {
     };
   }
 
-  private mapToCourtDto(courts: CourtQueryResult[]): CourtDto[] {
-    console.log('Mapping courts:', courts);
+  private getQueryCourtListClause(
+    query?: QueryCourtsSchema,
+  ): Prisma.CourtWhereInput {
+    return {
+      name: {
+        contains: query?.search?.trim() || undefined,
+      },
+      rating: {
+        gte: query?.rating || undefined,
+      },
+      ...(query?.sportTypes && {
+        categories: {
+          some: {
+            categoryId: {
+              in: query?.sportTypes,
+            },
+          },
+        },
+      }),
+      ...(query?.amenities && {
+        facilities: {
+          some: {
+            facilityId: {
+              in: query?.amenities,
+            },
+          },
+        },
+      }),
+      hourlyPrice: {
+        gte: query?.priceRange?.min || undefined,
+        lte: query?.priceRange?.max || undefined,
+      },
+    };
+  }
 
+  private mapToCourtDto(courts: CourtQueryResult[]): CourtDto[] {
     const mappedCourts: CourtDto[] = courts.map((court) => {
       return {
         ...court,
@@ -46,41 +80,24 @@ export class CourtsService {
     return mappedCourts;
   }
 
-  async getAllCourts(query: QueryCourtsSchema): Promise<CourtDto[]> {
-    const data = (await this.prismaClient.court.findMany({
-      include: this.getCourtInclude(),
-      where: {
-        name: {
-          contains: query.search?.trim() || undefined,
-        },
-        rating: {
-          gte: query.rating || undefined,
-        },
-        ...(query.sportTypes && {
-          categories: {
-            some: {
-              categoryId: {
-                in: query.sportTypes,
-              },
-            },
-          },
-        }),
-        ...(query.amenities && {
-          facilities: {
-            some: {
-              facilityId: {
-                in: query.amenities,
-              },
-            },
-          },
-        }),
-        hourlyPrice: {
-          gte: query.priceRange?.min || undefined,
-          lte: query.priceRange?.max || undefined,
-        },
-      },
-    })) as CourtQueryResult[];
+  async getAllCourts(
+    query: QueryCourtsSchema,
+  ): Promise<{ courts: CourtDto[]; totalCourts: number }> {
+    const whereClause = this.getQueryCourtListClause(query);
 
-    return this.mapToCourtDto(data);
+    const [courtList, totalCourts] = await Promise.all([
+      this.prismaClient.court.findMany({
+        include: this.getCourtInclude(),
+        where: whereClause,
+      }),
+      this.prismaClient.court.count({
+        where: whereClause,
+      }),
+    ]);
+
+    return {
+      courts: this.mapToCourtDto(courtList),
+      totalCourts,
+    };
   }
 }

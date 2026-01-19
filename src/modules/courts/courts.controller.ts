@@ -2,6 +2,7 @@ import { Controller, Get, Req, Res } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { CourtsService } from './courts.service';
 import { QueryCourtsSchema } from './courts.schema';
+import { convertCourtQueryList } from './helpers';
 
 @Controller('courts')
 export class CourtsController {
@@ -16,7 +17,10 @@ export class CourtsController {
     @Res() res: Response,
   ) {
     const query = req.query;
-    const courts = await this.courtServices.getAllCourts(query);
+
+    const queryParsed: QueryCourtsSchema = convertCourtQueryList(query);
+
+    const courts = await this.courtServices.getAllCourts(queryParsed);
 
     res.json({ courts });
   }
