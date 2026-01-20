@@ -17,7 +17,7 @@ export const convertCourtQueryList = (query: CourtQuery): QueryCourtsSchema => {
     sportTypes: converNumArray(query?.sportType),
     amenities: converNumArray(query?.amenities),
     max: Number(query.max) || undefined,
-    min: Number(query.min) || undefined,
+    min: Number(query.min) || 0,
     rating: Number(query.rating) || undefined,
     page: Number(query.page) || 1,
     limit: Number(query.limit) || 10,

@@ -80,12 +80,15 @@ export class CourtsService {
     return mappedCourts;
   }
 
-  async getAllCourts(
-    query: QueryCourtsSchema,
-  ): Promise<{ contents: CourtDto[]; totalCourts: number }> {
+  async getAllCourts(query: QueryCourtsSchema): Promise<{
+    contents: CourtDto[];
+    totalCount: number;
+    currentPage: number;
+    totalPage: number;
+  }> {
     const whereClause = this.getQueryCourtListClause(query);
 
-    const [courtList, totalCourts] = await Promise.all([
+    const [courtList, totalCourts] = await this.prismaClient.$transaction([
       this.prismaClient.court.findMany({
         take: query.limit,
         skip: (query.page - 1) * query.limit,
@@ -99,7 +102,9 @@ export class CourtsService {
 
     return {
       contents: this.mapToCourtDto(courtList),
-      totalCourts,
+      totalCount: totalCourts,
+      totalPage: Math.ceil(totalCourts / query.limit),
+      currentPage: query.page,
     };
   }
 }
