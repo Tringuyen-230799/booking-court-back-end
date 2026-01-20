@@ -11,7 +11,6 @@ import {
   IsNumber,
   MinLength,
   MaxLength,
-  IsObject,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
 
