@@ -4,9 +4,11 @@ interface CourtQuery {
   search?: string;
   sportType?: number[] | string[];
   amenities?: number[] | string[];
-  minPrice?: number | string;
-  maxPrice?: number | string;
+  min?: number;
+  max?: number;
   rating?: number;
+  page?: number | string;
+  limit?: number | string;
 }
 
 export const convertCourtQueryList = (query: CourtQuery): QueryCourtsSchema => {
@@ -14,11 +16,11 @@ export const convertCourtQueryList = (query: CourtQuery): QueryCourtsSchema => {
     search: query.search,
     sportTypes: converNumArray(query?.sportType),
     amenities: converNumArray(query?.amenities),
-    priceRange: {
-      max: Number(query.maxPrice),
-      min: Number(query.minPrice),
-    },
+    max: Number(query.max) || undefined,
+    min: Number(query.min) || undefined,
     rating: Number(query.rating) || undefined,
+    page: Number(query.page) || 1,
+    limit: Number(query.limit) || 10,
   };
 
   return convertedQuery;

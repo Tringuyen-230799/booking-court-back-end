@@ -20,7 +20,7 @@ async function main() {
   const categories = await seedCategories(prisma);
 
   // Seed courts with references
-  await seedMockCourts(20, categories, facilities);
+  await seedMockCourts(300, categories, facilities);
 
   await prisma.$disconnect();
   console.log('✅ Seeding complete!');

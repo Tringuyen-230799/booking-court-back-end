@@ -77,10 +77,20 @@ export class QueryCourtsSchema {
   amenities?: number[];
 
   @IsOptional()
-  @IsObject()
-  priceRange?: { min: number; max: number };
+  @IsNumber()
+  min?: number;
+
+  @IsOptional()
+  @IsNumber()
+  max?: number;
 
   @IsOptional()
   @IsNumber()
   rating?: number;
+
+  @IsNumber()
+  page: number;
+
+  @IsNumber()
+  limit: number;
 }

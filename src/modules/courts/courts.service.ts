@@ -53,8 +53,8 @@ export class CourtsService {
         },
       }),
       hourlyPrice: {
-        gte: query?.priceRange?.min || undefined,
-        lte: query?.priceRange?.max || undefined,
+        gte: query?.min || undefined,
+        lte: query?.max || undefined,
       },
     };
   }
@@ -82,11 +82,13 @@ export class CourtsService {
 
   async getAllCourts(
     query: QueryCourtsSchema,
-  ): Promise<{ courts: CourtDto[]; totalCourts: number }> {
+  ): Promise<{ contents: CourtDto[]; totalCourts: number }> {
     const whereClause = this.getQueryCourtListClause(query);
 
     const [courtList, totalCourts] = await Promise.all([
       this.prismaClient.court.findMany({
+        take: query.limit,
+        skip: (query.page - 1) * query.limit,
         include: this.getCourtInclude(),
         where: whereClause,
       }),
@@ -96,7 +98,7 @@ export class CourtsService {
     ]);
 
     return {
-      courts: this.mapToCourtDto(courtList),
+      contents: this.mapToCourtDto(courtList),
       totalCourts,
     };
   }
