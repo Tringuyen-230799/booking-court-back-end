@@ -103,8 +103,13 @@ export class CourtsService {
     return {
       contents: this.mapToCourtDto(courtList),
       totalCount: totalCourts,
-      totalPage: Math.ceil(totalCourts / query.limit),
+      totalPage: Math.ceil(totalCourts / query.limit) || 1,
       currentPage: query.page,
     };
+  }
+
+  async getCourtById(courtId: string) {
+    return this.prismaClient
+      .$queryRaw`SELECT * FROM "Court" WHERE id = ${courtId}`;
   }
 }
