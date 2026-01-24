@@ -14,7 +14,7 @@ export class CourtsService {
 
   private getCourtInclude() {
     return {
-      images: { select: { imageUrl: true } },
+      images: { select: { imageUrl: true, isPrimary: true } },
       categories: {
         select: { category: { select: { id: true, name: true } } },
       },
@@ -109,7 +109,9 @@ export class CourtsService {
   }
 
   async getCourtById(courtId: string) {
-    return this.prismaClient
-      .$queryRaw`SELECT * FROM "Court" WHERE id = ${courtId}`;
+    return await this.prismaClient.court.findUnique({
+      where: { id: courtId },
+      include: this.getCourtInclude(),
+    });
   }
 }

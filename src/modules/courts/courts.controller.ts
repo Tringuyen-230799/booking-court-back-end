@@ -50,7 +50,9 @@ export class CourtsController {
   async getCourtById(@Param('id') id: string, @Res() res: Response) {
     const court = await this.courtServices.getCourtById(id);
 
-    console.log(court);
+    if (!court) {
+      return res.status(404).json({ message: 'Court not found' });
+    }
 
     res.json({ court });
   }

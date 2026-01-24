@@ -25,7 +25,7 @@ model Court {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   address        String
-  description    Json?
+  description    String?
 
   // Many-to-many relationships
   categories CourtCategory[]
