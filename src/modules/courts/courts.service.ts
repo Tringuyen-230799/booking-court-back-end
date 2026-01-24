@@ -14,7 +14,7 @@ export class CourtsService {
 
   private getCourtInclude() {
     return {
-      images: { select: { imageUrl: true } },
+      images: { select: { imageUrl: true, isPrimary: true } },
       categories: {
         select: { category: { select: { id: true, name: true } } },
       },
@@ -103,8 +103,15 @@ export class CourtsService {
     return {
       contents: this.mapToCourtDto(courtList),
       totalCount: totalCourts,
-      totalPage: Math.ceil(totalCourts / query.limit),
+      totalPage: Math.ceil(totalCourts / query.limit) || 1,
       currentPage: query.page,
     };
+  }
+
+  async getCourtById(courtId: string) {
+    return await this.prismaClient.court.findUnique({
+      where: { id: courtId },
+      include: this.getCourtInclude(),
+    });
   }
 }
