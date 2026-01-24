@@ -1,4 +1,4 @@
-import { Controller, Get, Req, Res } from '@nestjs/common';
+import { Controller, Get, Param, Req, Res } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { CourtsService } from './courts.service';
 import { QueryCourtsSchema } from './courts.schema';
@@ -44,5 +44,16 @@ export class CourtsController {
     const amenities = await this.amentityServices.getAllAmenities();
 
     res.json({ data: amenities });
+  }
+
+  @Get(':id')
+  async getCourtById(@Param('id') id: string, @Res() res: Response) {
+    const court = await this.courtServices.getCourtById(id);
+
+    if (!court) {
+      return res.status(404).json({ message: 'Court not found' });
+    }
+
+    res.json({ court });
   }
 }
