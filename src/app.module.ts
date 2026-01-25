@@ -1,16 +1,39 @@
-import { Module } from '@nestjs/common';
+import {
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+  RequestMethod,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
-import { CourtsController } from './modules/courts/courts.controller';
+import { CourtsModule } from './modules/courts/courts.module';
+import { DevtoolsModule } from '@nestjs/devtools-integration';
+import { CatergoriesModule } from './modules/categoires/categories.module';
+import { AmentitiesModule } from './modules/amentites/amentities.module';
+import { PrismaModule } from './shared/config/Prisma/prisma.modules';
+import { LoggerMiddleware } from './shared/middleware/logger.middleware';
 
 @Module({
   imports: [
+    DevtoolsModule.register({
+      http: process.env.NODE_ENV !== 'production',
+    }),
     ConfigModule.forRoot({
       envFilePath: '.env',
     }),
+    PrismaModule,
+    CourtsModule,
+    CatergoriesModule,
+    AmentitiesModule,
   ],
-  controllers: [AppController, CourtsController],
+  controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer
+      .apply(LoggerMiddleware)
+      .forRoutes({ path: 'courts', method: RequestMethod.GET });
+  }
+}

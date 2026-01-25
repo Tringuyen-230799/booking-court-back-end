@@ -1,4 +1,4 @@
-import { PrismaService } from '../shared/config/prisma.service';
+import { PrismaService } from '../shared/config/Prisma/prisma.service';
 
 const facilityNames = [
   'WiFi',

@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import { Court } from 'generated/prisma';
-import { PrismaService } from 'src/shared/config/prisma.service';
+import { PrismaService } from 'src/shared/config/Prisma/prisma.service';
 
 const prisma = new PrismaService();
 
