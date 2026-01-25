@@ -1,4 +1,4 @@
-import { PrismaService } from '../shared/config/prisma.service';
+import { PrismaService } from '../shared/config/Prisma/prisma.service';
 import { seedFacilities } from './facilities.seed';
 import { seedCategories } from './categories.seed';
 import { seedMockCourts } from './courts.seed';

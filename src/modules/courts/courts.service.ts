@@ -1,16 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/shared/config/prisma.service';
+import { PrismaService } from 'src/shared/config/Prisma/prisma.service';
 import { CourtDto, CourtQueryResult } from './courts.dto';
 import { QueryCourtsSchema } from './courts.schema';
 import { Prisma } from 'generated/prisma';
 
 @Injectable()
 export class CourtsService {
-  private readonly prismaClient: PrismaService;
-
-  constructor() {
-    this.prismaClient = new PrismaService();
-  }
+  constructor(private prismaClient: PrismaService) {}
 
   private getCourtInclude() {
     return {
@@ -109,9 +105,11 @@ export class CourtsService {
   }
 
   async getCourtById(courtId: string) {
-    return await this.prismaClient.court.findUnique({
+    const court = await this.prismaClient.court.findUnique({
       where: { id: courtId },
       include: this.getCourtInclude(),
     });
+
+    return this.mapToCourtDto([court as CourtQueryResult])[0];
   }
 }

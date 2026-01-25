@@ -3,20 +3,16 @@ import type { Request, Response } from 'express';
 import { CourtsService } from './courts.service';
 import { QueryCourtsSchema } from './courts.schema';
 import { convertCourtQueryList } from './helpers';
-import { CatergoryServices } from 'src/shared/services/catergory.services';
-import { AmentityServices } from 'src/shared/services/amentites.services';
+import { CatergoriesServices } from 'src/modules/categoires/catergories.services';
+import { AmentitiesServices } from 'src/modules/amentites/amentities.services';
 
 @Controller('courts')
 export class CourtsController {
-  private readonly courtServices: CourtsService;
-  private readonly categoryServices: CatergoryServices;
-  private readonly amentityServices: AmentityServices;
-
-  constructor() {
-    this.courtServices = new CourtsService();
-    this.categoryServices = new CatergoryServices();
-    this.amentityServices = new AmentityServices();
-  }
+  constructor(
+    private courtServices: CourtsService,
+    private categoryServices: CatergoriesServices,
+    private amentityServices: AmentitiesServices,
+  ) {}
 
   @Get()
   async getAllCourts(
