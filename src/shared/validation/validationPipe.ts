@@ -12,11 +12,11 @@ export class ValidationPipe implements PipeTransform<unknown> {
     const object = plainToInstance(
       metatype as new (...args: unknown[]) => object,
       value,
-      {
-        excludeExtraneousValues: true, // Whitelist protection only
-      },
     );
-    const errors = await validate(object);
+    const errors = await validate(object, {
+      whitelist: true, // Remove properties without decorators
+      forbidNonWhitelisted: true, // Throw error for extra properties
+    });
     if (errors.length > 0) {
       const isDebugMode = process.env.NODE_ENV !== 'production';
       throw new BadRequestException(
