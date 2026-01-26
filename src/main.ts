@@ -1,16 +1,12 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 // import * as fs from 'fs';
-import { HttpExceptionFilter } from './shared/middleware/http-exception.filter';
-import { ValidationPipe } from './shared/validation/validationPipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     abortOnError: false,
     snapshot: true,
   });
-  app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     origin: process.env.CORS_ORIGIN,
   });

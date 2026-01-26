@@ -12,6 +12,9 @@ export class ValidationPipe implements PipeTransform<unknown> {
     const object = plainToInstance(
       metatype as new (...args: unknown[]) => object,
       value,
+      {
+        excludeExtraneousValues: true, // Whitelist protection only
+      },
     );
     const errors = await validate(object);
     if (errors.length > 0) {
@@ -20,7 +23,7 @@ export class ValidationPipe implements PipeTransform<unknown> {
         isDebugMode ? this.mapErrors(errors) : 'Validation failed',
       );
     }
-    return value;
+    return object; // Return transformed object with explicit transformations only
   }
 
   private toValidate(metatype: Function): boolean {
