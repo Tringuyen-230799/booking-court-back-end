@@ -28,7 +28,13 @@ import { LoggerMiddleware } from './shared/middleware/logger.middleware';
     AmentitiesModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    // {
+    //   provide: APP_PIPE,
+    //   useClass: ValidationPipe,
+    // },
+  ],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

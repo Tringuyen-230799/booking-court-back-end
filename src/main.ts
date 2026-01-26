@@ -1,7 +1,8 @@
-import { NestFactory, PartialGraphHost } from '@nestjs/core';
+import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
-import * as fs from 'fs';
+// import * as fs from 'fs';
 import { HttpExceptionFilter } from './shared/middleware/http-exception.filter';
+import { ValidationPipe } from './shared/validation/validationPipe';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -9,6 +10,7 @@ async function bootstrap() {
     snapshot: true,
   });
   app.useGlobalFilters(new HttpExceptionFilter());
+  app.useGlobalPipes(new ValidationPipe());
   app.enableCors({
     origin: process.env.CORS_ORIGIN,
   });
@@ -19,7 +21,7 @@ async function bootstrap() {
 }
 
 bootstrap().catch((err) => {
-  fs.writeFileSync('graph.json', PartialGraphHost.toString() ?? '');
+  // fs.writeFileSync('graph.json', PartialGraphHost.toString() ?? '');
   console.error('Error during bootstrap:', err);
   process.exit(1);
 });

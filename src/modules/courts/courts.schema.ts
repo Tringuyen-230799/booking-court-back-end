@@ -65,7 +65,7 @@ export class UpdateCourtDto extends PartialType(CreateCourtSchema) {}
 export class QueryCourtsSchema {
   @IsString()
   @IsOptional()
-  search?: string;
+  search: string;
 
   @IsOptional()
   @IsArray()

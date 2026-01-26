@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Req, Res } from '@nestjs/common';
+import { Controller, Get, Param, Query, Res } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { CourtsService } from './courts.service';
 import { QueryCourtsSchema } from './courts.schema';
@@ -16,13 +16,10 @@ export class CourtsController {
   ) {}
 
   @Get()
-  async getAllCourts(
-    @Req() req: Request<unknown, unknown, unknown, QueryCourtsSchema>,
-    @Res() res: Response,
-  ) {
-    const query = req.query;
+  async getAllCourts(@Query() query: QueryCourtsSchema, @Res() res: Response) {
+    const queries = query;
 
-    const queryParsed: QueryCourtsSchema = convertCourtQueryList(query);
+    const queryParsed: QueryCourtsSchema = convertCourtQueryList(queries);
 
     const courts = await this.courtServices.getAllCourts(queryParsed);
 
