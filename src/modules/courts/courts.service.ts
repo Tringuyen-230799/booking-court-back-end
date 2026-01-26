@@ -59,15 +59,15 @@ export class CourtsService {
     const mappedCourts: CourtDto[] = courts.map((court) => {
       return {
         ...court,
-        hourlyPrice: Number(court.hourlyPrice),
-        eventSurcharge: Number(court.eventSurcharge),
-        images: court.images.map((image) => ({
+        hourlyPrice: Number(court?.hourlyPrice) || 0,
+        eventSurcharge: Number(court?.eventSurcharge) || 0,
+        images: court?.images.map((image) => ({
           imageUrl: image.imageUrl,
         })),
-        categories: court.categories.map((category) => ({
+        categories: court?.categories.map((category) => ({
           name: category.category?.name,
         })),
-        facilities: court.facilities.map((facility) => ({
+        facilities: court?.facilities.map((facility) => ({
           name: facility.facility?.name,
         })),
       };
@@ -109,6 +109,10 @@ export class CourtsService {
       where: { id: courtId },
       include: this.getCourtInclude(),
     });
+
+    if (!court) {
+      return null;
+    }
 
     return this.mapToCourtDto([court as CourtQueryResult])[0];
   }

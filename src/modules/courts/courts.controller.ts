@@ -5,6 +5,7 @@ import { QueryCourtsSchema } from './courts.schema';
 import { convertCourtQueryList } from './helpers';
 import { CatergoriesServices } from 'src/modules/categoires/catergories.services';
 import { AmentitiesServices } from 'src/modules/amentites/amentities.services';
+import { NotFoundException } from 'src/shared/middleware/http-exception.filter';
 
 @Controller('courts')
 export class CourtsController {
@@ -46,9 +47,7 @@ export class CourtsController {
   async getCourtById(@Param('id') id: string, @Res() res: Response) {
     const court = await this.courtServices.getCourtById(id);
 
-    if (!court) {
-      return res.status(404).json({ message: 'Court not found' });
-    }
+    if (!court) throw new NotFoundException('court not found');
 
     res.json({ court });
   }
