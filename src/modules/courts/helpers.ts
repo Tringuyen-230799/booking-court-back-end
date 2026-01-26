@@ -13,7 +13,7 @@ interface CourtQuery {
 
 export const convertCourtQueryList = (query: CourtQuery): QueryCourtsSchema => {
   const convertedQuery: QueryCourtsSchema = {
-    search: query.search,
+    search: query?.search || '',
     sportTypes: converNumArray(query?.sportType),
     amenities: converNumArray(query?.amenities),
     max: Number(query.max) || undefined,

@@ -13,6 +13,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
+import { Type } from 'class-transformer';
 
 export class CreateCourtSchema {
   @IsString()
@@ -65,7 +66,7 @@ export class UpdateCourtDto extends PartialType(CreateCourtSchema) {}
 export class QueryCourtsSchema {
   @IsString()
   @IsOptional()
-  search?: string;
+  search: string;
 
   @IsOptional()
   @IsArray()
@@ -75,21 +76,26 @@ export class QueryCourtsSchema {
   @IsArray()
   amenities?: number[];
 
+  @Type(() => Number)
   @IsOptional()
   @IsNumber()
   min?: number;
 
+  @Type(() => Number)
   @IsOptional()
   @IsNumber()
   max?: number;
 
+  @Type(() => Number)
   @IsOptional()
   @IsNumber()
   rating?: number;
 
+  @Type(() => Number)
   @IsNumber()
   page: number;
 
+  @Type(() => Number)
   @IsNumber()
   limit: number;
 }
