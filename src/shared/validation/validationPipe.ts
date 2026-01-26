@@ -1,8 +1,42 @@
-import { ValidationError } from '@nestjs/common';
-import { ValidatorOptions } from 'class-validator';
+import { PipeTransform, Injectable, ArgumentMetadata } from '@nestjs/common';
+import { validate, ValidationError } from 'class-validator';
+import { plainToInstance } from 'class-transformer';
+import { BadRequestException } from '../middleware/http-exception.filter';
 
-export interface ValidationPipeOptions extends ValidatorOptions {
-  transform?: boolean;
-  disableErrorMessages?: boolean;
-  exceptionFactory?: (errors: ValidationError[]) => any;
+@Injectable()
+export class ValidationPipe implements PipeTransform<unknown> {
+  async transform(value: unknown, { metatype }: ArgumentMetadata) {
+    if (!metatype || !this.toValidate(metatype)) {
+      return value;
+    }
+    const object = plainToInstance(
+      metatype as new (...args: unknown[]) => object,
+      value,
+      {
+        excludeExtraneousValues: true, // Whitelist protection only
+      },
+    );
+    const errors = await validate(object);
+    if (errors.length > 0) {
+      const isDebugMode = process.env.NODE_ENV !== 'production';
+      throw new BadRequestException(
+        isDebugMode ? this.mapErrors(errors) : 'Validation failed',
+      );
+    }
+    return object; // Return transformed object with explicit transformations only
+  }
+
+  private toValidate(metatype: Function): boolean {
+    const types: Function[] = [String, Boolean, Number, Array, Object];
+    return !types.includes(metatype);
+  }
+
+  private mapErrors(
+    errors: ValidationError[],
+  ): Array<{ field: string; message: string }> {
+    return errors?.map((err) => ({
+      field: err.property,
+      message: Object.values(err.constraints || {}).join(', '),
+    }));
+  }
 }
