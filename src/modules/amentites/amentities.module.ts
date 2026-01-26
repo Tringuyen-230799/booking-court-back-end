@@ -1,6 +1,7 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { AmentitiesServices } from './amentities.services';
 
+@Global()
 @Module({
   exports: [AmentitiesServices],
   providers: [AmentitiesServices],
