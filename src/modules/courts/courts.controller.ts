@@ -1,5 +1,4 @@
-import { Controller, Get, Param, Query, Res } from '@nestjs/common';
-import type { Request, Response } from 'express';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { CourtsService } from './courts.service';
 import { QueryCourtsSchema } from './courts.schema';
 import { convertCourtQueryList } from './helpers';
@@ -16,36 +15,36 @@ export class CourtsController {
   ) {}
 
   @Get()
-  async getAllCourts(@Query() query: QueryCourtsSchema, @Res() res: Response) {
+  async getAllCourts(@Query() query: QueryCourtsSchema) {
     const queries = query;
 
     const queryParsed: QueryCourtsSchema = convertCourtQueryList(queries);
 
     const courts = await this.courtServices.getAllCourts(queryParsed);
 
-    res.json({ data: courts });
+    return courts;
   }
 
   @Get('categories')
-  async getAllCategories(@Res() res: Response) {
+  async getAllCategories() {
     const categories = await this.categoryServices.getAllCategories();
 
-    res.json({ data: categories });
+    return categories;
   }
 
   @Get('amenities')
-  async getAllAmenities(@Res() res: Response) {
+  async getAllAmenities() {
     const amenities = await this.amentityServices.getAllAmenities();
 
-    res.json({ data: amenities });
+    return amenities;
   }
 
   @Get(':id')
-  async getCourtById(@Param('id') id: string, @Res() res: Response) {
+  async getCourtById(@Param('id') id: string) {
     const court = await this.courtServices.getCourtById(id);
 
     if (!court) throw new NotFoundException('court not found');
 
-    res.json({ court });
+    return court;
   }
 }

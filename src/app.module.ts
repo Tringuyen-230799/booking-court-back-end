@@ -13,9 +13,10 @@ import { CatergoriesModule } from './modules/categoires/categories.module';
 import { AmentitiesModule } from './modules/amentites/amentities.module';
 import { PrismaModule } from './shared/config/Prisma/prisma.modules';
 import { LoggerMiddleware } from './shared/middleware/logger.middleware';
-import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ValidationPipe } from './shared/validation/validationPipe';
 import { HttpExceptionFilter } from './shared/middleware/http-exception.filter';
+import { ResponseInterceptor } from './shared/middleware/response.interceptor';
 
 @Module({
   imports: [
@@ -40,6 +41,10 @@ import { HttpExceptionFilter } from './shared/middleware/http-exception.filter';
     {
       provide: APP_FILTER,
       useClass: HttpExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
     },
   ],
 })
