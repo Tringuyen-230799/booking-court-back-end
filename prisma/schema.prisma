@@ -5,8 +5,8 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider     = "prisma-client-js"
+  output       = "../generated/prisma"
   moduleFormat = "cjs"
 }
 
@@ -27,19 +27,20 @@ model Court {
   address        String
   description    String?
 
-  // Many-to-many relationships
-  categories CourtCategory[]
-  facilities CourtFacility[]
-
-  images CourtImage[]
+  // Relationships
+  categories CourtCategory[] // Sports this court supports
+  facilities CourtFacility[] // Amenities available
+  images     CourtImage[]
+  bookings   Booking[] // All bookings for this court
 
   @@map("courts")
 }
 
 model Category {
-  id     Int             @id @default(autoincrement())
-  name   String          @unique
-  courts CourtCategory[]
+  id       Int             @id @default(autoincrement())
+  name     String          @unique
+  courts   CourtCategory[]
+  bookings Booking[] // Track which bookings use this sport type
 
   @@map("categories")
 }
@@ -73,13 +74,71 @@ model CourtFacility {
 }
 
 model CourtImage {
-  id           Int      @id @default(autoincrement())
+  id           Int     @id @default(autoincrement())
   courtId      String
-  court        Court    @relation(fields: [courtId], references: [id], onDelete: Cascade)
+  court        Court   @relation(fields: [courtId], references: [id], onDelete: Cascade)
   imageUrl     String
   altText      String?
-  displayOrder Int      @default(0)
-  isPrimary    Boolean  @default(false)
+  displayOrder Int     @default(0)
+  isPrimary    Boolean @default(false)
 
   @@map("court_images")
+}
+
+model Booking {
+  id               String        @id @default(uuid())
+  bookingReference String        @unique
+  startTime        DateTime
+  endTime          DateTime
+  notes            String?       @db.Text
+  status           BookingStatus @default(PENDING_PAYMENT)
+  expiresAt        DateTime
+  totalPrice       Decimal       @db.Decimal(10, 2)
+  paymentStatus    PaymentStatus @default(UNPAID)
+  paymentMethod    String?
+  paymentId        String?
+  paidAt           DateTime?
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  courtId    String
+  court      Court    @relation(fields: [courtId], references: [id], onDelete: Cascade)
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([courtId, startTime, endTime], name: "unique_court_time_slot")
+  @@index([courtId, startTime, endTime])
+  @@index([categoryId])
+  @@index([status, expiresAt])
+  @@map("bookings")
+}
+
+enum PaymentStatus {
+  UNPAID
+  PAID
+  REFUNDED
+}
+
+enum BookingStatus {
+  PENDING_PAYMENT
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+model User {
+  id          String    @id @default(uuid())
+  email       String    @unique
+  name        String?
+  password    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  isVerified  Boolean   @default(false)
+  phoneNumber String?
+  bookings    Booking[]
+
+  @@map("users")
 }

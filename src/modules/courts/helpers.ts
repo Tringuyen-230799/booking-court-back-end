@@ -1,9 +1,9 @@
-import { QueryCourtsSchema } from './courts.schema';
+import { QueryCourtsSchema } from './validation/courts.schema';
 
 interface CourtQuery {
   search?: string;
-  sportType?: number[] | string[];
-  amenities?: number[] | string[];
+  sportType?: number | number[] | string[];
+  amenities?: number | number[] | string[];
   min?: number;
   max?: number;
   rating?: number;
