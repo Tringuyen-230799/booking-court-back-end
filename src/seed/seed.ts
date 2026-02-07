@@ -2,6 +2,8 @@ import { PrismaService } from '../shared/config/Prisma/prisma.service';
 import { seedFacilities } from './facilities.seed';
 import { seedCategories } from './categories.seed';
 import { seedMockCourts } from './courts.seed';
+import { seedBookings } from './bookings.seed';
+import { seedUsers } from './users.seed';
 
 async function main() {
   const prisma = new PrismaService();
@@ -14,6 +16,8 @@ async function main() {
   await prisma.court.deleteMany({});
   await prisma.facility.deleteMany({});
   await prisma.category.deleteMany({});
+  await prisma.booking.deleteMany({});
+  await prisma.user.deleteMany({});
 
   // Seed facilities and categories
   const facilities = await seedFacilities(prisma);
@@ -21,6 +25,12 @@ async function main() {
 
   // Seed courts with references
   await seedMockCourts(300, categories, facilities);
+
+  // Seed Users
+  await seedUsers();
+
+  // Seed Bookings, implement as needed
+  await seedBookings();
 
   await prisma.$disconnect();
   console.log('✅ Seeding complete!');

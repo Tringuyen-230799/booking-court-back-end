@@ -1,6 +1,6 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { CourtsService } from './courts.service';
-import { QueryCourtsSchema } from './courts.schema';
+import { QueryCourtsSchema } from './validation/courts.schema';
 import { convertCourtQueryList } from './helpers';
 import { CatergoriesServices } from 'src/modules/categoires/catergories.services';
 import { AmentitiesServices } from 'src/modules/amentites/amentities.services';

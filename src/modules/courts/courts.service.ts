@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/config/Prisma/prisma.service';
 import { CourtDto, CourtQueryResult } from './courts.dto';
-import { QueryCourtsSchema } from './courts.schema';
+import { QueryCourtsSchema } from './validation/courts.schema';
 import { Prisma } from 'generated/prisma';
 
 @Injectable()
@@ -114,6 +114,7 @@ export class CourtsService {
       return null;
     }
 
+    // Enhance this function later
     return this.mapToCourtDto([court as CourtQueryResult])[0];
   }
 }
