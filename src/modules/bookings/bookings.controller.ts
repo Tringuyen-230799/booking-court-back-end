@@ -1,0 +1,41 @@
+import {
+  BadRequestException,
+  Controller,
+  Get,
+  Param,
+  ParseUUIDPipe,
+  Query,
+} from '@nestjs/common';
+import { BookingsService } from './bookings.service';
+import { BookingsSchemaQuery } from './validation/bookings.schema';
+
+@Controller('bookings')
+export class BookingsController {
+  constructor(private readonly bookingsService: BookingsService) {}
+
+  @Get()
+  async findAll() {
+    return await this.bookingsService.findAll();
+  }
+
+  @Get(':courtId')
+  async findCourt(
+    @Param('courtId', new ParseUUIDPipe()) courtId: string,
+    @Query() query: BookingsSchemaQuery,
+  ) {
+    if (!courtId) {
+      throw new BadRequestException('Court ID is required');
+    }
+
+    const courtBooking = await this.bookingsService.findByCourtId(
+      courtId,
+      query,
+    );
+
+    if (!courtBooking?.length) {
+      return { message: 'No bookings found for this court' };
+    }
+
+    return courtBooking;
+  }
+}

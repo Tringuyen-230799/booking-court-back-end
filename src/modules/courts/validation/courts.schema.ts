@@ -13,6 +13,7 @@ import {
   MaxLength,
 } from 'class-validator';
 import { PartialType } from '@nestjs/mapped-types';
+import { ToNumberArray } from 'src/shared/decorator/ToNumberArray';
 import { Type } from 'class-transformer';
 
 export class CreateCourtSchema {
@@ -68,10 +69,11 @@ export class QueryCourtsSchema {
   @IsOptional()
   search: string;
 
+  @ToNumberArray()
   @IsOptional()
-  @IsArray()
   sportTypes?: number[];
 
+  @ToNumberArray()
   @IsOptional()
   @IsArray()
   amenities?: number[];

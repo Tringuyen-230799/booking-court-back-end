@@ -13,21 +13,33 @@ export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    const status = exception.getStatus();
-    const payload = exception.getResponse() as {
-      message?: string;
-    };
-
     const includeDebug = process.env.NODE_ENV !== 'production';
 
-    response.status(status).json({
-      statusCode: status,
-      message: typeof payload === 'string' ? payload : payload?.message,
-      ...(includeDebug && {
-        timestamp: new Date().toISOString(),
-        stack: errorConvert(exception),
-      }),
-    });
+    if (exception instanceof HttpException) {
+      const status = exception?.getStatus() || HttpStatus.INTERNAL_SERVER_ERROR;
+      const payload = exception?.getResponse() as {
+        message?: string;
+      };
+
+      response.status(status).json({
+        statusCode: status,
+        message: typeof payload === 'string' ? payload : payload?.message,
+        ...(includeDebug && {
+          timestamp: new Date().toISOString(),
+          stack: errorConvert(exception),
+        }),
+      });
+    } else {
+      const stack = errorConvert(exception);
+      response.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+        message: 'Internal server error',
+        ...(includeDebug && {
+          timestamp: new Date().toISOString(),
+          stack,
+        }),
+      });
+    }
   }
 }
 

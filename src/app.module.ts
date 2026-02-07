@@ -17,6 +17,7 @@ import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
 import { ValidationPipe } from './shared/validation/validationPipe';
 import { HttpExceptionFilter } from './shared/middleware/http-exception.filter';
 import { ResponseInterceptor } from './shared/middleware/response.interceptor';
+import { BookingsModule } from './modules/bookings/bookings.module';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ResponseInterceptor } from './shared/middleware/response.interceptor';
     CourtsModule,
     CatergoriesModule,
     AmentitiesModule,
+    BookingsModule,
   ],
   controllers: [AppController],
   providers: [
