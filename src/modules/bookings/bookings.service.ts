@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/shared/config/Prisma/prisma.service';
-import { BookingsSchemaQuery } from './validation/bookings.schema';
+import { BookingsSchemaQuery } from './dto/bookings.dto';
 
 @Injectable()
 export class BookingsService {

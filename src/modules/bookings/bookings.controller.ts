@@ -7,7 +7,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { BookingsService } from './bookings.service';
-import { BookingsSchemaQuery } from './validation/bookings.schema';
+import { BookingsSchemaQuery } from './dto/bookings.dto';
 
 @Controller('bookings')
 export class BookingsController {
