@@ -14,8 +14,8 @@ export class BookingsController {
   constructor(private readonly bookingsService: BookingsService) {}
 
   @Get()
-  async findAll() {
-    return await this.bookingsService.findAll();
+  async findAll(@Query() query: BookingsSchemaQuery) {
+    return await this.bookingsService.findAll(query);
   }
 
   @Get(':courtId')
@@ -33,7 +33,7 @@ export class BookingsController {
     );
 
     if (!courtBooking?.length) {
-      return { message: 'No bookings found for this court' };
+      return [];
     }
 
     return courtBooking;

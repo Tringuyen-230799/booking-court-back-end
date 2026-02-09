@@ -26,27 +26,16 @@ function calculatePrice(
 }
 
 function randomDate(start: Date, end: Date): Date {
+  console.log('randomStart:: ', start, 'and', end);
   return new Date(
     start.getTime() + Math.random() * (end.getTime() - start.getTime()),
   );
 }
 
 /**
- * Rounds a date to the nearest 30-minute mark (e.g., 10:00, 10:30, 11:00, 11:30)
- */
-function roundToHalfHour(date: Date): Date {
-  const rounded = new Date(date);
-  const minutes = rounded.getMinutes();
-  const roundedMinutes = minutes < 30 ? 0 : 30;
-  rounded.setMinutes(roundedMinutes);
-  rounded.setSeconds(0);
-  rounded.setMilliseconds(0);
-  return rounded;
-}
-
-/**
  * Generates a valid booking time slot with start and end times on 30-minute boundaries
  * Duration options: 1h, 1.5h, or 2h
+ * Business hours: 6:00 AM - 11:00 PM (23:00)
  */
 function generateTimeSlot(
   start: Date,
@@ -55,11 +44,30 @@ function generateTimeSlot(
   const durations = [1, 1.5, 2]; // hours
   const duration = durations[Math.floor(Math.random() * durations.length)];
 
-  // Get random date and round to half-hour
+  // Get random date within the range
   const randomStart = randomDate(start, end);
-  const startTime = roundToHalfHour(randomStart);
 
-  // Add duration and ensure it's also on half-hour boundary
+  // Business hours: 6:00 - 23:00
+  const minHour = 6;
+  const maxEndHour = 23;
+
+  // Work with half-hour slots (0.5 hour increments)
+  const minSlot = minHour * 2; // 6:00 = slot 12
+  const maxSlot = maxEndHour * 2 - duration * 2; // Latest start slot that fits within business hours
+
+  // Generate random time slot
+  const randomSlot =
+    minSlot + Math.floor(Math.random() * (maxSlot - minSlot + 1));
+
+  // Convert slot number to hours and minutes
+  const hour = Math.floor(randomSlot / 2);
+  const minutes = (randomSlot % 2) * 30;
+
+  // Set the start time with business hours constraint in UTC
+  const startTime = new Date(randomStart);
+  startTime.setUTCHours(hour, minutes, 0, 0);
+
+  // Calculate end time
   const endTime = new Date(startTime.getTime() + duration * 60 * 60 * 1000);
 
   return { startTime, endTime };
@@ -69,7 +77,7 @@ function randomItem<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-export async function seedBookings() {
+export async function seedBookings(numOfRecords = 50) {
   console.log('🎾 Starting to seed bookings...');
 
   const [courts, users, categories] = await Promise.all([
@@ -115,11 +123,14 @@ export async function seedBookings() {
     notes: string | null;
   }> = [];
   const now = new Date();
-  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
-  const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const DaysAgo = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
+  const DaysFromNow = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
+
+  console.log('days ago:', DaysAgo);
+  console.log('days from now:', DaysFromNow);
 
   // Generate 50 bookings with various statuses
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < numOfRecords; i++) {
     const court = randomItem(courts);
     const categoryId = randomItem(categories).id;
     const userId = randomItem(users).id;
@@ -138,7 +149,7 @@ export async function seedBookings() {
 
     if (statusType < 0.1) {
       // 10% - PENDING_PAYMENT (upcoming, not yet paid)
-      const timeSlot = generateTimeSlot(now, thirtyDaysFromNow);
+      const timeSlot = generateTimeSlot(now, DaysFromNow);
       startTime = timeSlot.startTime;
       endTime = timeSlot.endTime;
       status = BookingStatus.PENDING_PAYMENT;
@@ -146,7 +157,7 @@ export async function seedBookings() {
       expiresAt = new Date(startTime.getTime() - 30 * 60 * 1000); // Expires 30 min before start
     } else if (statusType < 0.15) {
       // 5% - EXPIRED (didn't pay in time)
-      const timeSlot = generateTimeSlot(thirtyDaysAgo, now);
+      const timeSlot = generateTimeSlot(DaysAgo, now);
       startTime = timeSlot.startTime;
       endTime = timeSlot.endTime;
       status = BookingStatus.EXPIRED;
@@ -154,7 +165,7 @@ export async function seedBookings() {
       expiresAt = new Date(startTime.getTime() - 30 * 60 * 1000);
     } else if (statusType < 0.25) {
       // 10% - CANCELLED (paid but cancelled)
-      const timeSlot = generateTimeSlot(now, thirtyDaysFromNow);
+      const timeSlot = generateTimeSlot(now, DaysFromNow);
       startTime = timeSlot.startTime;
       endTime = timeSlot.endTime;
       status = BookingStatus.CANCELLED;
@@ -165,7 +176,7 @@ export async function seedBookings() {
       paymentId = `pay_${Math.random().toString(36).substring(2, 15)}`;
     } else if (statusType < 0.5) {
       // 25% - COMPLETED (past bookings)
-      const timeSlot = generateTimeSlot(thirtyDaysAgo, now);
+      const timeSlot = generateTimeSlot(DaysAgo, now);
       startTime = timeSlot.startTime;
       endTime = timeSlot.endTime;
       status = BookingStatus.COMPLETED;
@@ -176,7 +187,7 @@ export async function seedBookings() {
       paymentId = `pay_${Math.random().toString(36).substring(2, 15)}`;
     } else {
       // 50% - CONFIRMED (upcoming, paid)
-      const timeSlot = generateTimeSlot(now, thirtyDaysFromNow);
+      const timeSlot = generateTimeSlot(now, DaysFromNow);
       startTime = timeSlot.startTime;
       endTime = timeSlot.endTime;
       status = BookingStatus.CONFIRMED;

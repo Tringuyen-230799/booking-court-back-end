@@ -27,9 +27,9 @@ export class CourtsService {
       name: {
         contains: query?.search?.trim() || undefined,
       },
-      rating: {
-        gte: query?.rating || undefined,
-      },
+      // rating: {
+      //   gte: query?.rating || undefined,
+      // },
       ...(query?.sportTypes && {
         categories: {
           some: {
