@@ -1,8 +1,8 @@
-import { PrismaService } from '../shared/config/Prisma/prisma.service';
+import { PrismaService } from 'src/shared/config/Prisma/prisma.service';
+import { seedBookings } from './bookings.seed';
 import { seedFacilities } from './facilities.seed';
 import { seedCategories } from './categories.seed';
 import { seedMockCourts } from './courts.seed';
-import { seedBookings } from './bookings.seed';
 import { seedUsers } from './users.seed';
 
 async function main() {
@@ -30,7 +30,7 @@ async function main() {
   await seedUsers();
 
   // Seed Bookings, implement as needed
-  await seedBookings();
+  await seedBookings(1000);
 
   await prisma.$disconnect();
   console.log('✅ Seeding complete!');

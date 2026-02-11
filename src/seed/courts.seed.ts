@@ -38,18 +38,6 @@ const imageUrl = [
   'https://images.unsplash.com/photo-1546519638-68e109498ffc?w=400',
 ];
 
-async function main() {
-  console.log('🌱 Starting seed...');
-
-  // Clean existing data (in reverse order due to foreign keys)
-  await prisma.courtImage.deleteMany({});
-  await prisma.courtFacility.deleteMany({});
-  await prisma.courtCategory.deleteMany({});
-  await prisma.court.deleteMany({});
-  await prisma.facility.deleteMany({});
-  await prisma.category.deleteMany({});
-}
-
 // Helper to get random items from an array
 function getRandomItems<T>(array: T[], min = 1, max = 2): T[] {
   const count = Math.max(
@@ -66,7 +54,7 @@ export async function seedMockCourts(
   facilities: { id: number }[],
 ): Promise<Court[]> {
   if (count <= 0) return [];
-
+  const VIETNAM_UNIT_PRICE = 23000;
   const createdCourts: Court[] = [];
 
   for (let i = 0; i < count; i++) {
@@ -83,8 +71,8 @@ export async function seedMockCourts(
       data: {
         name,
         rating: Math.floor(Math.random() * 6), // 0-5
-        hourlyPrice: Math.floor(Math.random() * 30) + 10, // 10-39
-        eventSurcharge: Math.floor(Math.random() * 20), // 0-19
+        hourlyPrice: (Math.floor(Math.random() * 30) + 10) * VIETNAM_UNIT_PRICE, // 10-29
+        eventSurcharge: Math.floor(Math.random() * 20) * VIETNAM_UNIT_PRICE, // 0-19
         isAvailable: Math.random() > 0.2, // 80% available
         isIndoor: Math.random() > 0.5,
         address: addr,
@@ -127,12 +115,3 @@ export async function seedMockCourts(
 
   return createdCourts;
 }
-
-main()
-  .catch((e) => {
-    console.error('❌ Seed failed:', e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
