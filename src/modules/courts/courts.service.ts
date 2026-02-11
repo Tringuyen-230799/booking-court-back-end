@@ -23,13 +23,14 @@ export class CourtsService {
   private getQueryCourtListClause(
     query?: QueryCourtsSchema,
   ): Prisma.CourtWhereInput {
+    console.log('Query in clause:', query);
     return {
       name: {
         contains: query?.search?.trim() || undefined,
       },
-      // rating: {
-      //   gte: query?.rating || undefined,
-      // },
+      rating: {
+        gte: query?.rating || undefined,
+      },
       ...(query?.sportTypes && {
         categories: {
           some: {

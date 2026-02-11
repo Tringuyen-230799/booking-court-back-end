@@ -1,5 +1,6 @@
 import { BookingStatus, PaymentStatus } from 'generated/prisma';
 import { Decimal } from 'generated/prisma/runtime/client';
+import { DateTime } from 'luxon';
 import { PrismaService } from 'src/shared/config/Prisma/prisma.service';
 
 const prisma = new PrismaService();
@@ -26,7 +27,6 @@ function calculatePrice(
 }
 
 function randomDate(start: Date, end: Date): Date {
-  console.log('randomStart:: ', start, 'and', end);
   return new Date(
     start.getTime() + Math.random() * (end.getTime() - start.getTime()),
   );
@@ -35,39 +35,44 @@ function randomDate(start: Date, end: Date): Date {
 /**
  * Generates a valid booking time slot with start and end times on 30-minute boundaries
  * Duration options: 1h, 1.5h, or 2h
- * Business hours: 6:00 AM - 11:00 PM (23:00)
+ * Business hours: 6:00 AM - 11:00 PM (23:00) Vietnam Time (ICT/UTC+7)
+ * ⚠️ IMPORTANT: This function uses server's local timezone.
+ * Ensure your development environment is set to Asia/Ho_Chi_Minh timezone.
  */
 function generateTimeSlot(
   start: Date,
   end: Date,
 ): { startTime: Date; endTime: Date } {
-  const durations = [1, 1.5, 2]; // hours
+  const durations = [1, 1.5, 2];
   const duration = durations[Math.floor(Math.random() * durations.length)];
 
-  // Get random date within the range
   const randomStart = randomDate(start, end);
 
-  // Business hours: 6:00 - 23:00
-  const minHour = 6;
-  const maxEndHour = 23;
+  // Business hours in Vietnam timezone
+  const minHour = 6; // 6:00 AM Vietnam
+  const maxEndHour = 23; // 11:00 PM Vietnam
 
-  // Work with half-hour slots (0.5 hour increments)
-  const minSlot = minHour * 2; // 6:00 = slot 12
-  const maxSlot = maxEndHour * 2 - duration * 2; // Latest start slot that fits within business hours
+  const minSlot = minHour * 2;
+  const maxSlot = maxEndHour * 2 - duration * 2;
 
-  // Generate random time slot
   const randomSlot =
     minSlot + Math.floor(Math.random() * (maxSlot - minSlot + 1));
 
-  // Convert slot number to hours and minutes
   const hour = Math.floor(randomSlot / 2);
   const minutes = (randomSlot % 2) * 30;
 
-  // Set the start time with business hours constraint in UTC
-  const startTime = new Date(randomStart);
-  startTime.setUTCHours(hour, minutes, 0, 0);
+  // Create DateTime in Vietnam timezone
+  const vietnamTime = DateTime.fromJSDate(randomStart, {
+    zone: 'Asia/Ho_Chi_Minh',
+  }).set({
+    hour,
+    minute: minutes,
+    second: 0,
+    millisecond: 0,
+  });
 
-  // Calculate end time
+  // Convert to UTC and back to JS Date
+  const startTime = vietnamTime.toUTC().toJSDate();
   const endTime = new Date(startTime.getTime() + duration * 60 * 60 * 1000);
 
   return { startTime, endTime };
@@ -125,9 +130,6 @@ export async function seedBookings(numOfRecords = 50) {
   const now = new Date();
   const DaysAgo = new Date(now.getTime() - 5 * 24 * 60 * 60 * 1000);
   const DaysFromNow = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
-
-  console.log('days ago:', DaysAgo);
-  console.log('days from now:', DaysFromNow);
 
   // Generate 50 bookings with various statuses
   for (let i = 0; i < numOfRecords; i++) {

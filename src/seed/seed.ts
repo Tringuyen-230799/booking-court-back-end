@@ -1,34 +1,39 @@
+import { PrismaService } from 'src/shared/config/Prisma/prisma.service';
 import { seedBookings } from './bookings.seed';
+import { seedFacilities } from './facilities.seed';
+import { seedCategories } from './categories.seed';
+import { seedMockCourts } from './courts.seed';
+import { seedUsers } from './users.seed';
 
 async function main() {
-  // const prisma = new PrismaService();
+  const prisma = new PrismaService();
   console.log('🌱 Starting full seed...');
 
-  // // Clean up existing data (optional: move to a shared util if needed)
-  // await prisma.courtImage.deleteMany({});
-  // await prisma.courtFacility.deleteMany({});
-  // await prisma.courtCategory.deleteMany({});
-  // await prisma.court.deleteMany({});
-  // await prisma.facility.deleteMany({});
-  // await prisma.category.deleteMany({});
-  // await prisma.booking.deleteMany({});
-  // await prisma.user.deleteMany({});
+  // Clean up existing data (optional: move to a shared util if needed)
+  await prisma.courtImage.deleteMany({});
+  await prisma.courtFacility.deleteMany({});
+  await prisma.courtCategory.deleteMany({});
+  await prisma.court.deleteMany({});
+  await prisma.facility.deleteMany({});
+  await prisma.category.deleteMany({});
+  await prisma.booking.deleteMany({});
+  await prisma.user.deleteMany({});
 
-  // // Seed facilities and categories
-  // const facilities = await seedFacilities(prisma);
-  // const categories = await seedCategories(prisma);
+  // Seed facilities and categories
+  const facilities = await seedFacilities(prisma);
+  const categories = await seedCategories(prisma);
 
-  // // Seed courts with references
-  // await seedMockCourts(300, categories, facilities);
+  // Seed courts with references
+  await seedMockCourts(300, categories, facilities);
 
-  // // Seed Users
-  // await seedUsers();
+  // Seed Users
+  await seedUsers();
 
   // Seed Bookings, implement as needed
-  await seedBookings(1);
+  await seedBookings(1000);
 
-  // await prisma.$disconnect();
-  // console.log('✅ Seeding complete!');
+  await prisma.$disconnect();
+  console.log('✅ Seeding complete!');
 }
 
 main().catch((e) => {
