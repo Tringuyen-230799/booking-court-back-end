@@ -9,20 +9,42 @@ export class ValidationPipe implements PipeTransform<unknown> {
     if (!metatype || !this.toValidate(metatype)) {
       return value;
     }
+
+    // Handle null/undefined values before transformation
+    if (value === null || value === undefined) {
+      throw new BadRequestException('Request body is required');
+    }
+
+    // Ensure value is an object (not a primitive or array)
+    if (typeof value !== 'object' || Array.isArray(value)) {
+      throw new BadRequestException('Request body must be an object');
+    }
+
     const object = plainToInstance(
       metatype as new (...args: unknown[]) => object,
       value,
     );
     const errors = await validate(object, {
-      whitelist: true, // Remove properties without decorators
-      forbidNonWhitelisted: true, // Throw error for extra properties
+      whitelist: true,
+      forbidNonWhitelisted: true,
     });
+
     if (errors.length > 0) {
       const isDebugMode = process.env.NODE_ENV !== 'production';
+      const errorDetails = this.mapErrors(errors);
+
+      if (isDebugMode) {
+        console.error(
+          'Validation errors:',
+          JSON.stringify(errorDetails, null, 2),
+        );
+      }
+
       throw new BadRequestException(
-        isDebugMode ? this.mapErrors(errors) : 'Validation failed',
+        isDebugMode ? errorDetails : 'Validation failed',
       );
     }
+
     return object; // Return transformed object with explicit transformations only
   }
 

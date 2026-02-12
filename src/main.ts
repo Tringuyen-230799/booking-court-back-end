@@ -1,14 +1,22 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
+import { NestExpressApplication } from '@nestjs/platform-express';
 // import * as fs from 'fs';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
-    abortOnError: false,
-    snapshot: true,
-  });
+  const app: NestExpressApplication =
+    await NestFactory.create<NestExpressApplication>(AppModule, {
+      abortOnError: false,
+      snapshot: true,
+      bodyParser: true,
+    });
+
   app.enableCors({
     origin: process.env.CORS_ORIGIN,
+  });
+
+  app.useBodyParser('json', {
+    limit: '10mb',
   });
 
   await app.listen(process.env.PORT ?? 3000, () => {
