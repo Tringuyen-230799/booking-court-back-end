@@ -105,9 +105,22 @@ export class CourtsService {
     };
   }
 
-  async getCourtById(courtId: string) {
+  async getCourtById(
+    courtId: string,
+    categoryId?: number,
+  ): Promise<CourtDto | null> {
     const court = await this.prismaClient.court.findUnique({
-      where: { id: courtId },
+      where: {
+        id: courtId,
+        ...(categoryId && {
+          categories: {
+            some: {
+              categoryId,
+            },
+          },
+        }),
+        isAvailable: true,
+      },
       include: this.getCourtInclude(),
     });
 

@@ -17,13 +17,24 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof HttpException) {
       const status = exception?.getStatus() || HttpStatus.INTERNAL_SERVER_ERROR;
-      const payload = exception?.getResponse() as {
-        message?: string;
-      };
+      const payload = exception?.getResponse() as
+        | string
+        | { status?: number; message?: string };
+
+      // Handle different payload formats
+      let message: unknown;
+      if (typeof payload === 'string') {
+        message = payload;
+      } else if (Array.isArray(payload?.message)) {
+        // Validation errors array - keep as is
+        message = payload.message;
+      } else {
+        message = payload?.message || 'An error occurred';
+      }
 
       response.status(status).json({
         statusCode: status,
-        message: typeof payload === 'string' ? payload : payload?.message,
+        message,
         ...(includeDebug && {
           timestamp: new Date().toISOString(),
           stack: errorConvert(exception),
