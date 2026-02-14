@@ -18,6 +18,7 @@ import { ValidationPipe } from './shared/validation/validationPipe';
 import { HttpExceptionFilter } from './shared/middleware/http-exception.filter';
 import { ResponseInterceptor } from './shared/middleware/response.interceptor';
 import { BookingsModule } from './modules/bookings/bookings.module';
+import { UsersModule } from './modules/users/users.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { BookingsModule } from './modules/bookings/bookings.module';
     CatergoriesModule,
     AmentitiesModule,
     BookingsModule,
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [
