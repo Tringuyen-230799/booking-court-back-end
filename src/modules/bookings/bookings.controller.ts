@@ -11,9 +11,9 @@ import {
 import { BookingsService } from './bookings.service';
 import { BookingsSchemaQuery, CreateBookingDto } from './dto/bookings.dto';
 import { DateTime } from 'luxon';
-import { REQUIRED_TIME_SLOTS } from 'src/shared/constant/booking';
 import { CourtsService } from '../courts/courts.service';
 import { UsersService } from '../users/users.service';
+import { BOOKING_HOUR } from 'src/shared/constant/booking';
 
 @Controller('bookings')
 export class BookingsController {
@@ -55,31 +55,49 @@ export class BookingsController {
     payload: CreateBookingDto,
   ) {
     const { startTime, endTime, categoryId, courtId, userId } = payload;
-
-    // Validate time slots 6:00 - 23:00
-    // Still need to validate the date
-
-    const openingHour = 6;
-    const closingHour = 21;
-
     const startHour = DateTime.fromISO(startTime);
     const endHour = DateTime.fromISO(endTime);
 
-    if (openingHour < startHour.hour && endHour.hour > closingHour) {
+    // Add this validation
+    if (!startHour.isValid || !endHour.isValid) {
+      throw new BadRequestException('Invalid date format');
+    }
+
+    if (startHour.toISODate() !== endHour.toISODate()) {
       throw new BadRequestException('Invalid time booking');
+    }
+
+    const openingHour = startHour.set({
+      hour: BOOKING_HOUR.START_TIME,
+      minute: 0,
+      second: 0,
+      millisecond: 0,
+    });
+
+    const closingHour = endHour.set({
+      hour: BOOKING_HOUR.END_TIME,
+      minute: 0,
+      second: 0,
+      millisecond: 0,
+    });
+
+    if (
+      startHour.toMillis() < openingHour.toMillis() ||
+      endHour.toMillis() > closingHour.toMillis()
+    ) {
+      throw new BadRequestException(
+        'Booking time must be within business hours',
+      );
     }
 
     if (startHour.toMillis() >= endHour.toMillis()) {
-      throw new BadRequestException('Invalid time booking');
+      throw new BadRequestException('Start time must be before end time');
     }
 
-    const startMinutes = startHour.minute;
-
-    if (
-      startMinutes !== REQUIRED_TIME_SLOTS[0] &&
-      startMinutes !== REQUIRED_TIME_SLOTS[1]
-    ) {
-      throw new BadRequestException('Invalid time booking');
+    if (startHour.minute % 30 !== 0 || endHour.minute % 30 !== 0) {
+      throw new BadRequestException(
+        'Time Does not align with 30-minute intervals',
+      );
     }
 
     const totalMinutes = endHour.toMillis() - startHour.toMillis();
@@ -87,7 +105,9 @@ export class BookingsController {
     const endTimeValid = totalMinutes > 0 ? totalMinutes % 30 === 0 : false;
 
     if (!endTimeValid) {
-      throw new BadRequestException('Invalid time booking');
+      throw new BadRequestException(
+        'Booking duration must be in 30-minute increments',
+      );
     }
 
     const court = await this.courtsService.getCourtById(courtId, categoryId);
