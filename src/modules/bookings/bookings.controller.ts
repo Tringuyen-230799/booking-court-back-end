@@ -58,7 +58,6 @@ export class BookingsController {
     const startHour = DateTime.fromISO(startTime);
     const endHour = DateTime.fromISO(endTime);
 
-    // Add this validation
     if (!startHour.isValid || !endHour.isValid) {
       throw new BadRequestException('Invalid date format');
     }
