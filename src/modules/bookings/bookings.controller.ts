@@ -59,6 +59,16 @@ export class BookingsController {
     // Validate time slots 6:00 - 23:00
     // Still need to validate the date
 
+    const openingHour = 6;
+    const closingHour = 21;
+
+    const start = DateTime.fromISO(startTime).hour;
+    const end = DateTime.fromISO(endTime).hour;
+
+    if (openingHour < start && end > closingHour) {
+      throw new BadRequestException('Invalid time booking');
+    }
+
     if (new Date(startTime) >= new Date(endTime)) {
       throw new BadRequestException('Invalid time booking');
     }

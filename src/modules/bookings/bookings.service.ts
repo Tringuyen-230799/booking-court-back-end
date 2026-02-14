@@ -74,6 +74,7 @@ export class BookingsService {
     return await this.prismaClient.$transaction(async (tx) => {
       const { courtId, endTime, startTime, userId, categoryId, totalPrice } =
         payload;
+
       const isBooking = await tx.booking.findUnique({
         where: {
           unique_court_time_slot: {
