@@ -62,18 +62,18 @@ export class BookingsController {
     const openingHour = 6;
     const closingHour = 21;
 
-    const start = DateTime.fromISO(startTime).hour;
-    const end = DateTime.fromISO(endTime).hour;
+    const startHour = DateTime.fromISO(startTime);
+    const endHour = DateTime.fromISO(endTime);
 
-    if (openingHour < start && end > closingHour) {
+    if (openingHour < startHour.hour && endHour.hour > closingHour) {
       throw new BadRequestException('Invalid time booking');
     }
 
-    if (new Date(startTime) >= new Date(endTime)) {
+    if (startHour.toMillis() >= endHour.toMillis()) {
       throw new BadRequestException('Invalid time booking');
     }
 
-    const startMinutes = DateTime.fromISO(startTime).minute;
+    const startMinutes = startHour.minute;
 
     if (
       startMinutes !== REQUIRED_TIME_SLOTS[0] &&
@@ -82,9 +82,7 @@ export class BookingsController {
       throw new BadRequestException('Invalid time booking');
     }
 
-    const startHour = DateTime.fromISO(startTime).toMillis() / 1000;
-    const endHour = DateTime.fromISO(endTime).toMillis() / 1000;
-    const totalMinutes = endHour - startHour;
+    const totalMinutes = endHour.toMillis() - startHour.toMillis();
 
     const endTimeValid = totalMinutes > 0 ? totalMinutes % 30 === 0 : false;
 
