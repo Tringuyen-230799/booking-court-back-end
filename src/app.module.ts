@@ -19,7 +19,8 @@ import { HttpExceptionFilter } from './shared/middleware/http-exception.filter';
 import { ResponseInterceptor } from './shared/middleware/response.interceptor';
 import { BookingsModule } from './modules/bookings/bookings.module';
 import { UsersModule } from './modules/users/users.module';
-
+import { MailerModule } from '@nestjs-modules/mailer';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 @Module({
   imports: [
     DevtoolsModule.register({
@@ -27,7 +28,23 @@ import { UsersModule } from './modules/users/users.module';
     }),
     ConfigModule.forRoot({
       envFilePath: '.env',
+      isGlobal: true,
     }),
+    MailerModule.forRoot({
+      defaults: {
+        from: '"nest-modules" <modules@nestjs.com>',
+      },
+      transport: {
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false,
+        auth: {
+          user: process.env.EMAIL_USERNAME,
+          pass: process.env.EMAIL_PASSWORD,
+        },
+      },
+    }),
+    EventEmitterModule.forRoot(),
     PrismaModule,
     CourtsModule,
     CatergoriesModule,
