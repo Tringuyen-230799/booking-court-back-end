@@ -10,9 +10,13 @@ import {
 import { randomUUID } from 'node:crypto';
 import { BOOKING_STATUS } from 'src/shared/constant/booking';
 import { DateTime } from 'luxon';
+import { EventEmitterService } from 'src/shared/services/EventEmitter';
 @Injectable()
 export class BookingsService {
-  constructor(private readonly prismaClient: PrismaService) {}
+  constructor(
+    private readonly prismaClient: PrismaService,
+    private readonly EventEmitterService: EventEmitterService,
+  ) {}
 
   async findAll(query: BookingsSchemaQuery) {
     const businessHours = getBusinessHoursInUTC(query.date);
@@ -75,15 +79,7 @@ export class BookingsService {
       const { courtId, endTime, startTime, userId, categoryId, totalPrice } =
         payload;
 
-      const isBooking = await tx.booking.findUnique({
-        where: {
-          unique_court_time_slot: {
-            courtId: courtId,
-            startTime: new Date(startTime),
-            endTime: new Date(endTime),
-          },
-        },
-      });
+      const isBooking = await this.checkBooking(payload);
 
       if (isBooking) {
         throw new Error('The selected time slot is already booked');
@@ -103,17 +99,25 @@ export class BookingsService {
         },
       });
 
+      this.EventEmitterService.sendVerificationBooking({
+        to: process.env.EMAIL_TESTING,
+        subject: 'Booking Confirmation',
+        text: `Your booking with reference ${newBookings.bookingReference} has been created. Please complete the payment within 15 minutes to confirm your booking.`,
+      });
+
       return newBookings;
     });
   }
 
   async checkBooking(payload: CreateBookingDto) {
-    const bookingCourt = await this.prismaClient.booking.findUnique({
+    const bookingCourt = await this.prismaClient.booking.findFirst({
       where: {
-        unique_court_time_slot: {
-          courtId: payload.courtId,
-          startTime: new Date(payload.startTime),
-          endTime: new Date(payload.endTime),
+        courtId: payload.courtId,
+        endTime: {
+          gt: new Date(payload.startTime),
+        },
+        startTime: {
+          lt: new Date(payload.endTime),
         },
       },
     });

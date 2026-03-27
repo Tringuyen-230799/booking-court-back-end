@@ -57,6 +57,14 @@ export class BookingsController {
     const { startTime, endTime, categoryId, courtId, userId } = payload;
     const startHour = DateTime.fromISO(startTime);
     const endHour = DateTime.fromISO(endTime);
+    const currentTime = DateTime.now();
+
+    if (
+      startHour.toMillis() < currentTime.toMillis() ||
+      endHour.toMillis() < currentTime.toMillis()
+    ) {
+      throw new BadRequestException('Booking time must be in the future');
+    }
 
     if (!startHour.isValid || !endHour.isValid) {
       throw new BadRequestException('Invalid date format');
